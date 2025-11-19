@@ -31,6 +31,8 @@ pipeline {
             }
         }
     }
+
+    post {
         success {
             echo '====================================================='
             echo '     BUILD VERT !!! FELICITATIONS MAHDI !'
@@ -40,5 +42,5 @@ pipeline {
         failure {
             echo 'Build échoué – regarde les logs ci-dessus'
         }
+    }
 }
-
