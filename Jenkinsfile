@@ -33,6 +33,13 @@ pipeline {
     }
 
     post {
+        always {
+            // Nettoyage propre des conteneurs Testcontainers
+            sh 'docker ps -q --filter "label=org.testcontainers=true" | xargs -r docker rm -f || true'
+            
+            // Publication des résultats de tests
+            junit testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true
+        }
         success {
             echo '====================================================='
             echo '     BUILD VERT !!! FELICITATIONS MAHDI !'
