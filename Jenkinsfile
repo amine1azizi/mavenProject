@@ -31,13 +31,11 @@ pipeline {
 
     post {
         success {
-            echo '====================================='
-            echo '   BUILD RÉUSSI EN MOINS DE 20 SECONDES !'
-            echo '   Bravo Mahdi, ton CI est parfait !'
-            echo '====================================='
+            echo ' BUILD RÉUSSI '
         }
         failure {
-            echo '❌ Le build a échoué – consulte les logs.'
+            echo ' ❌ Le build a échoué '
         }
     }
 }   
+
