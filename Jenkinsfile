@@ -1,25 +1,30 @@
 pipeline {
     agent any
 
+    triggers {
+        // Déclenche le build à chaque push sur GitHub
+        githubPush()
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                echo 'Récupération du code GitHub...'
+                echo 'Récupération du code depuis GitHub...'
                 checkout scm
             }
         }
 
         stage('Build sans tests') {
             steps {
-                echo 'Compilation et packaging avec Maven...'
+                echo 'Compilation avec Maven...'
                 sh 'mvn -B clean install -DskipTests'
             }
         }
 
         stage('Archive JAR') {
             steps {
-                echo 'Archivage du JAR...'
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true, onlyIfSuccessful: true
+                echo 'Archivage du fichier JAR...'
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
     }
@@ -27,12 +32,12 @@ pipeline {
     post {
         success {
             echo '====================================='
-            echo '   BUILD VERT EN MOINS DE 20 SECONDES !'
+            echo '   BUILD RÉUSSI EN MOINS DE 20 SECONDES !'
             echo '   Bravo Mahdi, ton CI est parfait !'
             echo '====================================='
         }
         failure {
-            echo 'Build échoué – regarde les logs ci-dessus'
+            echo '❌ Le build a échoué – consulte les logs.'
         }
     }
-}
+}   
