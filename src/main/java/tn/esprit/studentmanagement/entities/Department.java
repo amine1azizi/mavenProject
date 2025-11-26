@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.util.List;
 
+
+
 @Entity
 @Getter
 @Setter
@@ -24,4 +26,5 @@ public class Department {
     @OneToMany(mappedBy = "department")
     private List<Student> students;
 }
+
 
