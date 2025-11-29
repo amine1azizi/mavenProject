@@ -19,18 +19,19 @@ pipeline {
         }
 
         stage('Build & SonarQube analysis') {
-            steps {
-                echo 'Analyse SonarQube en cours...'
-                withSonarQubeEnv('My SonarQube Server') {
-                    sh '''
-                        mvn -B clean verify sonar:sonar \
-                            -Dspring.datasource.url="jdbc:mysql://my-mysql:3306/mydb?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC" \
-                            -Dspring.datasource.username=root \
-                            -Dspring.datasource.password=
-                    '''
-                }
-            }
+    steps {
+        echo 'Analyse SonarQube en cours...'
+        withSonarQubeEnv('My SonarQube Server') {
+            sh '''
+                mvn -B clean verify sonar:sonar \
+                    -Dspring.datasource.url="jdbc:mysql://my-mysql:3306/studentdb?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC" \
+                    -Dspring.datasource.username=root \
+                    -Dspring.datasource.password= \
+                    -Dspring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+            '''
         }
+    }
+}
 
         stage('Quality Gate') {
             steps {
@@ -57,3 +58,4 @@ pipeline {
         }
     }
 }
+
