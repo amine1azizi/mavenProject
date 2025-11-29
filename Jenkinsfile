@@ -26,8 +26,15 @@ pipeline {
                 script {
                     echo "Analyse SonarQube en cours..."
                     withSonarQubeEnv('My SonarQube Server') {
-                        sh "mvn clean verify sonar:sonar"
-                    }
+                sh '''
+                    mvn -B clean verify sonar:sonar \
+                        -Dspring.datasource.url=jdbc:mysql://my-mysql:3306/mydb?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC \
+                        -Dspring.datasource.username=root \
+                        -Dspring.datasource.password= \
+                        -Dspring.datasource.hikari.connection-timeout=60000 \
+                        -Dspring.datasource.hikari.maximum-pool-size=5
+                '''
+            }
                 }
             }
         }
@@ -62,3 +69,4 @@ pipeline {
         }
     }
 }
+
