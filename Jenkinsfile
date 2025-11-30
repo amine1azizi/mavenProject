@@ -32,7 +32,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo 'Running SonarQube...'
-                withSonarQubeEnv('sonar') {
+                withSonarQubeEnv('SonarServer') {
                     sh 'mvn sonar:sonar'
                 }
             }
@@ -62,4 +62,5 @@ pipeline {
         }
     }
 }
+
 
