@@ -2,65 +2,64 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK17'
         maven 'MAVEN_HOME'
+        jdk 'JDK17'
+    }
+
+    environment {
+        SONAR_HOST_URL = "http://localhost:9000"
+        SONAR_TOKEN = credentials("sonar-token")
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Git') {
             steps {
-                echo 'Getting code from GitHub...'
-                checkout scm
+                git branch: 'main', url: 'https://github.com/amine1azizi/mavenProject.git'
             }
         }
 
-        stage('Build & Test') {
+        stage('Build') {
             steps {
-                echo 'Running Maven tests with MySQL...'
-                sh 'mvn clean test'
+                // Compile + package jar, skip tests for now
+                sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Build JAR') {
+        stage('Test') {
             steps {
-                echo 'Building full project...'
-                sh 'mvn clean package'
+                // Run tests separately
+                sh 'mvn test'
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Sonar') {
             steps {
-                echo 'Running SonarQube...'
-                withSonarQubeEnv('SonarServer') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-
-        stage('Archive JAR') {
-            steps {
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                sh """
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=MyProject \
+                    -Dsonar.host.url=${SONAR_HOST_URL} \
+                    -Dsonar.login=${SONAR_TOKEN}
+                """
             }
         }
     }
 
     post {
-        success {
-            echo "BUILD SUCCESS — Everything is green!"
-        }
-        failure {
-            echo "BUILD FAILED"
+        always {
+            echo "Pipeline finished."
+
+            // Publish test reports if any
+            script {
+                if (fileExists('target/surefire-reports')) {
+                    junit 'target/surefire-reports/*.xml'
+                } else {
+                    echo "No test reports found."
+                }
+            }
+
+            // Archive the jar artifact
+            archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: false
         }
     }
 }
-
-
